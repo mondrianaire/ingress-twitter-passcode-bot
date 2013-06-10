@@ -71,21 +71,22 @@ class IngressActionMonitor():
         jsonStr = self.getChat(self.minTimestampMs)
         try:
             responseItems = json.loads(jsonStr)
+        #print(responseItems)
+            if 'result' not in responseItems:
+                if 'error' in responseItems:
+                    print(str(responseItems))
+                else:
+                    print(responseItems)
+                    #pass
+            else:
+                responseItemsOrderedAsc = responseItems['result']
+                responseItemsOrderedAsc.reverse()
+                for message in responseItemsOrderedAsc:
+                    yield message
+                    self.minTimestampMs = message[1] + 1
         except (ValueError, TypeError):
             responseItems = jsonStr
-        #print(responseItems)
-        if 'result' not in responseItems:
-            if 'error' in responseItems:
-                print(str(responseItems))
-            else:
-                print(responseItems)
-                #pass
-        else:
-            responseItemsOrderedAsc = responseItems['result']
-            responseItemsOrderedAsc.reverse()
-            for message in responseItemsOrderedAsc:
-                yield message
-                self.minTimestampMs = message[1] + 1
+            print(responseItems.encode('ascii', 'ignore'))
     
     def actiongen(self):
         messages = self.messagegen()
